@@ -34,3 +34,6 @@
 # Data files
 *.root
 *.h5
+
+# Main c++ executable:
+larcv2_to_larcv3
