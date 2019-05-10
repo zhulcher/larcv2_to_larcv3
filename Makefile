@@ -1,4 +1,14 @@
+
+#################################################################
+# Here are the variables you may need to change:
+
 CC=clang++
+H5_INCDIR=/opt/local/include/
+H5_LIBDIR=/opt/local/lib/
+
+#################################################################
+
+
 
 # Python path does not need to be set for larcv3
 
@@ -13,18 +23,17 @@ LARCV3_LIBDIR=$(shell PYTHONPATH="" python -c "import larcv; print(larcv.get_lib
 # export ROOT_FLAGS=$(root-config --cflags)
 # export ROOT_LIBS=$(root-config --libs)
 
-H5_INCDIR=/opt/local/include/
-H5_LIBDIR=/opt/local/lib/
 
-CFLAGS=-I. -I${LARCV3_INCDIR} -I${LARCV_INCDIR} -I${H5_INCDIR} $(shell root-config --cflags) -O3 -g
+
+CFLAGS=-I. -I${LARCV3_INCDIR} -I${LARCV_INCDIR} -I${H5_INCDIR} $(shell root-config --cflags) -g
 
 LDFLAGS=$(shell root-config --libs) ${ROOT_LIBS} -L ${LARCV_LIBDIR} \
--llarcv -L ${LARCV3_LIBDIR} -lbase -ldataformat \
+-llarcv -L ${LARCV3_LIBDIR} -llarcv3 \
 -L${H5_LIBDIR} -lhdf5 -lhdf5_cpp
 
 DEPS = larcv2_to_larcv3.h
-OBJ = larcv2_to_larcv3.o main.o 
-EXEC = larcv2_to_larcv3
+OBJ = larcv2_to_larcv3.o
+EXEC = larcv2_to_larcv3.so
 
 all: $(EXEC)
 
@@ -33,7 +42,7 @@ all: $(EXEC)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 $(EXEC): $(OBJ)
-	$(CC) -o $@ $^ $(LDFLAGS)
+	$(CC) -shared -o $@ $^ $(LDFLAGS)
 
 clean:
 	rm *.o
