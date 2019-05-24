@@ -16,7 +16,7 @@ public:
     // ~larcv2_to_larcv3();
     
     void initialize();
-    void convert(int n_events = -1);
+    void convert(int n_events = -1, int n_skip = 0);
 
     void add_in_file(const char * filename);
 
@@ -52,7 +52,7 @@ extern "C"
     void larcv2_to_larcv3_add_in_file (larcv2_to_larcv3* larcv2_to_larcv3, const char * s) {larcv2_to_larcv3->add_in_file(s);}
     void larcv2_to_larcv3_set_out_file(larcv2_to_larcv3* larcv2_to_larcv3, const char * s) {larcv2_to_larcv3->set_out_file(s);}
     void larcv2_to_larcv3_initialize(larcv2_to_larcv3* larcv2_to_larcv3) {larcv2_to_larcv3->initialize();}
-    void larcv2_to_larcv3_convert(larcv2_to_larcv3* larcv2_to_larcv3, int n) {larcv2_to_larcv3->convert(n);}
+    void larcv2_to_larcv3_convert(larcv2_to_larcv3* larcv2_to_larcv3, int n_events, int n_skip) {larcv2_to_larcv3->convert(n_events, n_skip);}
 }
 
 #endif

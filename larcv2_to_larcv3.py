@@ -14,7 +14,7 @@ class larcv2_to_larcv3(object):
         lib.larcv2_to_larcv3_set_out_file.restype = ctypes.c_void_p
         lib.larcv2_to_larcv3_initialize.argtypes = [ctypes.c_void_p]
         lib.larcv2_to_larcv3_initialize.restype = ctypes.c_void_p
-        lib.larcv2_to_larcv3_convert.argtypes = [ctypes.c_void_p, ctypes.c_int]
+        lib.larcv2_to_larcv3_convert.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.c_int]
         lib.larcv2_to_larcv3_convert.restype = ctypes.c_void_p
         self.obj = lib.larcv2_to_larcv3_new()
 
@@ -31,8 +31,8 @@ class larcv2_to_larcv3(object):
     def initialize(self):
         lib.larcv2_to_larcv3_initialize(self.obj)
 
-    def convert(self, n):
-        lib.larcv2_to_larcv3_convert(self.obj, n)
+    def convert(self, n_events, n_skip):
+        lib.larcv2_to_larcv3_convert(self.obj, n_events, n_skip)
 
 
 import argparse
@@ -47,6 +47,10 @@ def main():
     parser.add_argument('-nevents','--num-events',
                         type=int, dest='nevents', default=-1,
                         help='integer, Number of events to process')
+
+    parser.add_argument('-nskip','--num-skip',
+                        type=int, dest='nskip', default=0,
+                        help='integer, Number of events to skip before processing')
 
     parser.add_argument('-ol','--output-larcv',default='',
                         type=str, dest='larcv_fout',
@@ -67,7 +71,7 @@ def main():
     converter.set_out_file(args.larcv_fout)
 
     converter.initialize()
-    converter.convert(args.nevents)
+    converter.convert(args.nevents, args.nskip)
 
 
 if __name__ == "__main__":

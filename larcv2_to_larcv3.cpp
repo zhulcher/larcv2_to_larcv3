@@ -14,13 +14,28 @@
 #include "larcv/core/DataFormat/EventVoxel3D.h"
 
 
-void larcv2_to_larcv3::convert(int n_events){
+void larcv2_to_larcv3::convert(int n_events, int n_skip){
+
+    int max_events = larcv2_manager.get_n_entries();
 
     if (n_events == -1){
-        n_events = larcv2_manager.get_n_entries();
+        n_events = max_events;
     }
 
-    for (size_t i = 0; i < n_events; i ++ ){
+    if (n_skip >= max_events) {
+        std::cout << "Nothing to do, n_skip == " << n_skip 
+                  << " < max_events == " << max_events << std::endl;
+        return;
+    }
+
+    int range = n_events;
+    // if there aren't enough events, reduce the range:
+    if (range > max_events - n_skip){
+        range = max_events - n_skip;
+    }
+
+    
+    for (size_t i = n_skip; i < range; i ++ ){
         convert_event(i);
             larcv3_manager.set_id(larcv2_manager.event_id().run(),
             larcv2_manager.event_id().subrun(), 
