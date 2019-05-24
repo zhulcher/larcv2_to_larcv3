@@ -34,9 +34,12 @@ void larcv2_to_larcv3::convert(int n_events, int n_skip){
         range = max_events - n_skip;
     }
 
+    std::cout << "Range: " << range << std::endl;
+    std::cout << "n_skip: " << n_skip << std::endl;
+
     
-    for (size_t i = n_skip; i < range; i ++ ){
-        convert_event(i);
+    for (size_t i = 0; i < range; i ++ ){
+        convert_event(i+n_skip);
             larcv3_manager.set_id(larcv2_manager.event_id().run(),
             larcv2_manager.event_id().subrun(), 
             larcv2_manager.event_id().event());
@@ -127,11 +130,13 @@ void larcv2_to_larcv3::convert_image2d(std::string producer){
         coords.resize(2);
         for (size_t i_row = 0; i_row < image.meta().rows(); i_row ++  ){
             for (size_t i_col = 0; i_col < image.meta().cols(); i_col ++ ){
-                coords[0] = i_row;
-                coords[1] = i_col;
-                new_image.set_pixel(coords, image.pixel(i_row, i_col));
-                original_sum += image.pixel(i_row, i_col);
-                new_sum += new_image.pixel(coords);
+                if (image.pixel(i_row, i_col) != 0){
+                    coords[0] = i_row;
+                    coords[1] = i_col;
+                    new_image.set_pixel(coords, image.pixel(i_row, i_col));
+                    original_sum += image.pixel(i_row, i_col);
+                    new_sum += new_image.pixel(coords);
+                }
             }
         }
 
@@ -346,13 +351,13 @@ void larcv2_to_larcv3::convert_cluster3d(std::string producer){
     larcv3::SparseCluster3D output_cluster3d_set;
     output_cluster3d_set.meta(meta);
 
+
     for ( auto & cluster3d_set : input_cluster_3D->as_vector()){
 
 
         //holder for new cluster:
         larcv3::VoxelSet vs;
         vs.id(cluster3d_set.id());
-
         for (auto & original_voxel :  cluster3d_set.as_vector()){
             if (original_voxel.id() > meta.total_voxels()) continue;
             // Convert all of the voxels:
