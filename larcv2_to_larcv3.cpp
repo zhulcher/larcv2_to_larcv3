@@ -228,8 +228,8 @@ void larcv2_to_larcv3::convert_sparse2d(std::string producer){
         
         // Create a larcv3 meta for this:
         larcv3::ImageMeta2D meta; 
-        meta.set_dimension(1, sparse2d.meta().width(),  sparse2d.meta().rows(), sparse2d.meta().min_x());
-        meta.set_dimension(0, sparse2d.meta().height(), sparse2d.meta().cols(), sparse2d.meta().min_y());
+        meta.set_dimension(0, sparse2d.meta().width(),  sparse2d.meta().rows(), sparse2d.meta().min_x());
+        meta.set_dimension(1, sparse2d.meta().height(), sparse2d.meta().cols(), sparse2d.meta().min_y());
         meta.set_projection_id(sparse2d.meta().id());
 
         // print(sparse2d.meta().dump())
@@ -300,8 +300,8 @@ void larcv2_to_larcv3::convert_cluster2d(std::string producer){
 
         // Create a larcv3 meta for this:
         larcv3::ImageMeta2D meta; 
-        meta.set_dimension(1, original_meta.width(),  original_meta.rows(), original_meta.min_x());
-        meta.set_dimension(0, original_meta.height(), original_meta.cols(), original_meta.min_y());
+        meta.set_dimension(0, original_meta.width(),  original_meta.rows(), original_meta.min_x());
+        meta.set_dimension(1, original_meta.height(), original_meta.cols(), original_meta.min_y());
         meta.set_projection_id(original_meta.id());
 
         // Create a place to hold the output cluster2d:
@@ -314,8 +314,8 @@ void larcv2_to_larcv3::convert_cluster2d(std::string producer){
             // Convert all of the voxels:
             for (auto & original_voxel : cluster.as_vector()){
                 std::vector<size_t> vec_of_coords;
-                vec_of_coords.push_back(original_meta.index_to_col(original_voxel.id()));
                 vec_of_coords.push_back(original_meta.index_to_row(original_voxel.id()));
+                vec_of_coords.push_back(original_meta.index_to_col(original_voxel.id()));
                 auto new_index = meta.index(vec_of_coords);
                 vs.emplace(new_index, original_voxel.value(), false);
             }
