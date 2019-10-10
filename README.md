@@ -13,6 +13,18 @@ Once the makefile is updated, you should run `make` and it will compile the conv
 
 ## Converting a file
 
+After you build the software, you should have `larcv2_to_larcv3.so` in the directory.  When you try to run, however, it may crash with an `image not found` error since this library isn't on any sort of path.  You might also get this problem if it can't find the larcv3 library.  The way to fix this is straightfoward:
+
+Open python with PYTHONPATH unset:  `PYTHONPATH="" python`
+Then, import larcv and call a function: 
+```
+import larcv
+print(larcv.get_lib_dir())
+```
+
+This will output a long path that goes through python libraries, and should end with ...egg/larcv/lib/
+Add this whole path (ending in .../larvc/lib) to the LD_LIBRARY_PATH variable and it should be found at run time.
+
 You can use the python wrapper to run the converter - all of the conversion will be driven in C++ for speed, but the python wrapper let's you configure input/output and number events.
 
 You can control the arguments with python command line args:
@@ -22,3 +34,7 @@ You can control the arguments with python command line args:
  - `-nskip` controls how many events to skip before starting to convert.
 
 It's recommended you use the viewers to analyze the output of the conversion and make sure things are good: https://github.com/DeepLearnPhysics/larcv-viewer.  By default, the viewer works with larcv3, but there is a larcv2 tag (no longer being developed) that will show larcv2 files.
+
+
+# Problems
+If you have problems building, running, or think there is a conversion bug, please open an issue!
