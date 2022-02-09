@@ -28,7 +28,7 @@ pybind2_incdir=/app/larcv3/src/pybind11/include
 
 
 
-CFLAGS=-I. -I${LARCV3_INCDIR} -I${LARCV_INCDIR} -I${H5_INCDIR} -I${pybind_incdir} -I${pybind2_incdir} -I${json_incdir} -I $(shell root-config --cflags) -g
+CFLAGS=-I. -I${LARCV3_INCDIR} -I${LARCV_INCDIR} -I${H5_INCDIR} -I${pybind_incdir} -I${pybind2_incdir} -I${json_incdir} -I/usr/include/python3.6m -I/usr/include/python3.6m -I $(shell root-config --cflags) -g
 
 LDFLAGS=$(shell root-config --libs) ${ROOT_LIBS} -L ${LARCV_LIBDIR} \
 -llarcv -L ${LARCV3_LIBDIR} -llarcv3 \
