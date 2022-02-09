@@ -151,7 +151,7 @@ void larcv2_to_larcv3::convert_particle(std::string producer){
 
     // Get the particles from the input and output file:
     larcv::EventParticle * input_particle = (larcv::EventParticle *) larcv2_manager.get_data("particle", producer);
-    larcv3::EventParticle * output_particle = (larcv3::EventParticle *) larcv3_manager.get_data("particle", producer);
+    std::shared_ptr<EventParticle> output_particle = std::dynamic_pointer_cast<larcv3::EventParticle> larcv3_manager.get_data("particle", producer);
 
     for (auto & particle : input_particle->as_vector()){
         larcv3::Particle new_particle;
@@ -218,10 +218,8 @@ void larcv2_to_larcv3::convert_sparse2d(std::string producer){
     // std::cout << "Calling sparse2d for producer " << producer << std::endl;
 
     // Get the particles from the input and output file:
-    larcv::EventSparseTensor2D  * input_sparse2d  
-        = (larcv::EventSparseTensor2D *)  larcv2_manager.get_data("sparse2d", producer);
-    larcv3::EventSparseTensor2D * output_sparse2d 
-        = (larcv3::EventSparseTensor2D * ) larcv3_manager.get_data("sparse2d", producer);
+    larcv::EventSparseTensor2D  * input_sparse2d  = (larcv::EventSparseTensor2D *)  larcv2_manager.get_data("sparse2d", producer);
+    std::shared_ptr<larcv3::EventSparseTensor2D> output_sparse2d = std::dynamic_pointer_cast<larcv3::EventSparseTensor2D> larcv3_manager.get_data("sparse2d", producer);
 
     // print(producer, "Number of input sparse tensors: ", input_sparse2d.as_vector().size())
     for ( auto & sparse2d : input_sparse2d->as_vector()){
@@ -255,10 +253,8 @@ void larcv2_to_larcv3::convert_sparse2d(std::string producer){
 }
 void larcv2_to_larcv3::convert_sparse3d(std::string producer){
     // Get the tensors from the input and output file:
-    larcv::EventSparseTensor3D  * input_sparse3d  
-        = (larcv::EventSparseTensor3D * )  larcv2_manager.get_data("sparse3d", producer);
-    larcv3::EventSparseTensor3D * output_sparse3d 
-        = (larcv3::EventSparseTensor3D * ) larcv3_manager.get_data("sparse3d", producer);
+    larcv::EventSparseTensor3D  * input_sparse3d  = (larcv::EventSparseTensor3D * )  larcv2_manager.get_data("sparse3d", producer);
+    std::shared_ptr<larcv3::EventSparseTensor3D> output_sparse3d = std::dynamic_pointer_cast<larcv3::EventSparseTensor3D> larcv3_manager.get_data("sparse3d", producer);
 
     auto & original_meta = input_sparse3d->meta();
 
@@ -289,10 +285,8 @@ void larcv2_to_larcv3::convert_sparse3d(std::string producer){
 }
 void larcv2_to_larcv3::convert_cluster2d(std::string producer){
     // Get the clusters from the input and output file:
-    larcv::EventClusterPixel2D  * input_cluster_2D  
-        = (larcv::EventClusterPixel2D *)  larcv2_manager.get_data("cluster2d", producer);
-    larcv3::EventSparseCluster2D * output_cluster_2D 
-        = (larcv3::EventSparseCluster2D * ) larcv3_manager.get_data("cluster2d", producer);
+    larcv::EventClusterPixel2D  * input_cluster_2D  = (larcv::EventClusterPixel2D *)  larcv2_manager.get_data("cluster2d", producer);
+    std::shared_ptr<larcv3::EventSparseCluster2D> output_cluster_2D = std::dynamic_pointer_cast<larcv3::EventSparseCluster2D> larcv3_manager.get_data("cluster2d", producer);
 
     for (auto & cluster2d_set : input_cluster_2D->as_vector()){
 
@@ -333,11 +327,9 @@ void larcv2_to_larcv3::convert_cluster2d(std::string producer){
 }
 void larcv2_to_larcv3::convert_cluster3d(std::string producer){
    
-    larcv::EventClusterVoxel3D  * input_cluster_3D  
-        = (larcv::EventClusterVoxel3D *)  larcv2_manager.get_data("cluster3d", producer);
-    larcv3::EventSparseCluster3D * output_cluster_3D 
-        = (larcv3::EventSparseCluster3D * ) larcv3_manager.get_data("cluster3d", producer);
-        
+    larcv::EventClusterVoxel3D  * input_cluster_3D  = (larcv::EventClusterVoxel3D *)  larcv2_manager.get_data("cluster3d", producer);
+    std::shared_ptr<larcv3::EventSparseCluster3D> output_cluster_3D = std::dynamic_pointer_cast<larcv3::EventSparseCluster3D> larcv3_manager.get_data("cluster3d", producer);
+
     auto & original_meta = input_cluster_3D->meta();
 
     // Create a larcv3 meta for this:
