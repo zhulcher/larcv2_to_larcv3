@@ -25,6 +25,7 @@ pybind2_incdir=/app/larcv3/src/pybind11/include
 
 # export ROOT_FLAGS=$(root-config --cflags)
 # export ROOT_LIBS=$(root-config --libs)
+LARCV_LIBDIR=/app/larcv2/build/lib
 
 
 
