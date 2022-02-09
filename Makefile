@@ -2,7 +2,7 @@
 #################################################################
 # Here are the variables you may need to change:
 
-CC=clang++
+CC=/usr/bin/g++
 H5_INCDIR=/opt/local/include/
 H5_LIBDIR=/opt/local/lib/
 
