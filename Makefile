@@ -15,7 +15,7 @@ H5_LIBDIR=/opt/local/lib/
 LARCV3_INCDIR=$(shell PYTHONPATH="" python -c "import larcv; print(larcv.get_includes())")
 LARCV3_LIBDIR=$(shell PYTHONPATH="" python -c "import larcv; print(larcv.get_lib_dir())")
 
-# $(LARCV3_INCDIR)
+LARCV3_INCDIR=/usr/local/lib/python3.6/dist-packages/larcv-3.4.1-py3.6-linux-x86_64.egg/larcv/include
 
 
 # export PYTHONPATH=$PYTHONPATH_BACKUP
