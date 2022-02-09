@@ -4,7 +4,7 @@
 
 CC=/usr/bin/g++
 H5_INCDIR=/usr/include/hdf5/serial/
-H5_LIBDIR=/opt/local/lib/
+H5_LIBDIR=/usr/lib/x86_64-linux-gnu/hdf5/serial/
 
 #################################################################
 
