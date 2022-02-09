@@ -3,7 +3,7 @@
 # Here are the variables you may need to change:
 
 CC=/usr/bin/g++
-H5_INCDIR=/opt/local/include/
+H5_INCDIR=/usr/include/hdf5/serial/
 H5_LIBDIR=/opt/local/lib/
 
 #################################################################
