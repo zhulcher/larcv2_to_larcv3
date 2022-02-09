@@ -106,7 +106,7 @@ void larcv2_to_larcv3::convert_image2d(std::string producer){
 
     // Get the image2d from the input and output file:
     larcv::EventImage2D  * input_image_2d  = (larcv::EventImage2D * ) larcv2_manager.get_data("image2d", producer);
-    larcv3::EventImage2D * output_image_2d = (larcv3::EventImage2D *) larcv3_manager.get_data("image2d", producer);
+    larcv3::EventTensor * output_image_2d = (larcv3::EventTensor *) larcv3_manager.get_data("image2d", producer);
 
     for ( auto & image : input_image_2d->as_vector()){
 
