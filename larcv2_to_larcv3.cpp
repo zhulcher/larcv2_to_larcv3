@@ -151,7 +151,7 @@ void larcv2_to_larcv3::convert_particle(std::string producer){
 
     // Get the particles from the input and output file:
     larcv::EventParticle * input_particle = (larcv::EventParticle *) larcv2_manager.get_data("particle", producer);
-    std::shared_ptr<larcv3::EventParticle> output_particle = std::dynamic_pointer_cast<larcv3::EventParticle> (larcv3_manager.get_data("particle", producer));
+    std::shared_ptr<larcv3::EventParticle> output_particle = std::dynamic_pointer_cast<larcv3::EventParticle>(larcv3_manager.get_data("particle", producer));
 
     for (auto & particle : input_particle->as_vector()){
         larcv3::Particle new_particle;
