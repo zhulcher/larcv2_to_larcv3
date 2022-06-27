@@ -16,7 +16,7 @@ H5_LIBDIR=/usr/lib/x86_64-linux-gnu/hdf5/serial/
 #LARCV3_INCDIR=$(shell PYTHONPATH="" python -c "import larcv; print(larcv.get_includes())")
 #LARCV3_LIBDIR=$(shell PYTHONPATH="" python -c "import larcv; print(larcv.get_lib_dir())")
 
-LARCV3_LIBDIR=/usr/local/lib/python3.6/dist-packages/larcv-3.4.1-py3.6-linux-x86_64.egg/larcv/lib
+LARCV3_LIBDIR=/usr/local/lib/python3.6/dist-packages/larcv-3.4.2-py3.6-linux-x86_64.egg/larcv/lib
 LARCV3_INCDIR=${LARCV3_BASEDIR}/src
 pybind_incdir=${LARCV3_BASEDIR}/src/pybind11_json/include
 json_incdir=${LARCV3_BASEDIR}/src/json/include
