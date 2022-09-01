@@ -8,7 +8,7 @@
 
 
 // Larcv2 includes:
-#include "larcv/core/DataFormat/EventTensor.h"
+#include "larcv/core/DataFormat/EventImage2D.h"
 #include "larcv/core/DataFormat/EventParticle.h"
 #include "larcv/core/DataFormat/EventVoxel2D.h"
 #include "larcv/core/DataFormat/EventVoxel3D.h"
