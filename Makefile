@@ -14,17 +14,13 @@ CC=g++
 
 # Python path does not need to be set for larcv3
 
-LARCV3_INCDIR=$(shell PYTHONPATH="" python -c "import larcv; print(larcv.get_includes())")
-LARCV3_LIBDIR=$(shell PYTHONPATH="" python -c "import larcv; print(larcv.get_lib_dir())")
-
-
 
 H5_INCDIR=$(shell`h5c++ -show` | tr ' ' '\n' | grep I/ -m1)
 H5_LIBDIR=$(shell`h5c++ -show` | tr ' ' '\n' | grep L/ -m1)
 
 LARCV3_INCDIR=$(shell PYTHONPATH="" python3 -c "import larcv; print(larcv.get_includes())")
 LARCV3_LIBDIR=$(shell PYTHONPATH="" python3 -c "import larcv; print(larcv.get_lib_dir())")
-LARCV_LIBDIR=${LARCV_LIBDIR}
+LARCV_LIBDIR=${LARCV3_BASEDIR}/lib
 
 pybind_incdir=${LARCV3_BASEDIR}/src/pybind11_json/include
 json_incdir=${LARCV3_BASEDIR}/src/json/include
