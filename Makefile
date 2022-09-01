@@ -3,7 +3,7 @@
 # Here are the variables you may need to change:
 
 
-LARCV3_BASEDIR=/app/larcv3/
+LARCV3_BASEDIR=/app/larcv3
 #H5_INCDIR=/usr/include/hdf5/serial/
 #H5_LIBDIR=/usr/lib/x86_64-linux-gnu/hdf5/serial/
 
