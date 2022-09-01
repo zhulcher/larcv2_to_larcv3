@@ -19,8 +19,8 @@ LARCV3_LIBDIR=$(shell PYTHONPATH="" python -c "import larcv; print(larcv.get_lib
 
 
 
-H5_INCDIR=echo `h5c++ -show` | tr ' ' '\n' | grep I/ -m1
-H5_LIBDIR=echo `h5c++ -show` | tr ' ' '\n' | grep L/ -m1
+H5_INCDIR=`h5c++ -show` | tr ' ' '\n' | grep I/ -m1
+H5_LIBDIR=`h5c++ -show` | tr ' ' '\n' | grep L/ -m1
 
 LARCV3_INCDIR=$(shell PYTHONPATH="" python3 -c "import larcv; print(larcv.get_includes())")
 LARCV3_LIBDIR=$(shell PYTHONPATH="" python3 -c "import larcv; print(larcv.get_lib_dir())")
