@@ -37,3 +37,4 @@
 
 # Main c++ executable:
 larcv2_to_larcv3
+larcv3_to_larcv2
