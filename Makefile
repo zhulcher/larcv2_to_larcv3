@@ -15,8 +15,8 @@ CC=g++
 # Python path does not need to be set for larcv3
 
 
-H5_INCDIR=$(shell `h5c++ -show` | tr ' ' '\n' | grep I/ -m1)
-H5_LIBDIR=$(shell `h5c++ -show` | tr ' ' '\n' | grep L/ -m1)
+H5_INCDIR=$(shell h5c++ -show | tr ' ' '\n' | grep I/ -m1)
+H5_LIBDIR=$(shell h5c++ -show | tr ' ' '\n' | grep L/ -m1)
 
 LARCV3_INCDIR=$(shell PYTHONPATH="" python3 -c "import larcv; print(larcv.get_includes())")
 LARCV3_LIBDIR=$(shell PYTHONPATH="" python3 -c "import larcv; print(larcv.get_lib_dir())")
