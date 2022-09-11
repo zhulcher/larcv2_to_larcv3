@@ -15,7 +15,7 @@
 
 
 
-void larcv2_to_larcv::convert(int n_events, int n_skip){
+void larcv3_to_larcv2::convert(int n_events, int n_skip){
 
     int max_events = larcv3_manager.get_n_entries();
 
@@ -116,12 +116,16 @@ void larcv3_to_larcv2::convert_image2d(std::string producer){
     for ( auto & image : input_image_2d->as_vector()){
 
         // Create a larcv3 meta for this:
-        larcv::ImageMeta2D  meta;
-        
-        // print()
-        meta.set_dimension(0, image.meta().width(),  image.meta().rows(), image.meta().min_x());
-        meta.set_dimension(1, image.meta().height(), image.meta().cols(), image.meta().min_y());
-        meta.set_projection_id(image.meta().id());
+        //larcv::ImageMeta  meta;
+
+        larcv::ImageMeta meta=larcv::ImageMeta(image.meta().min(0), image.meta().min(1),
+                 image.meta().max(0), image.meta().max(1),
+                 image.meta().number_of_voxels(0), image.meta().number_of_voxels(1), 
+                 static_cast<larcv::ProjectionID_t>(image.meta().id()),static_cast<larcv::DistanceUnit_t>(image.meta().unit()));
+
+            // print()
+        // meta.set_dimension(0, image.meta().width(), image.meta().rows(), image.meta().min()[0]);
+        // meta.set_dimension(1, image.meta().height(), image.meta().cols(), image.meta().min()[1]);
 
 
         // Convert the input image to the output image by transposing:
@@ -135,19 +139,20 @@ void larcv3_to_larcv2::convert_image2d(std::string producer){
         coords.resize(2);
         for (size_t i_row = 0; i_row < image.meta().rows(); i_row ++  ){
             for (size_t i_col = 0; i_col < image.meta().cols(); i_col ++ ){
-                if (image.pixel(i_row, i_col) != 0){
+                std::vector<size_t> rowcal{i_row, i_col};
+
+                if (image.pixel(rowcal) != 0){
                     coords[0] = i_row;
                     coords[1] = i_col;
-                    new_image.set_pixel(coords, image.pixel(i_row, i_col));
-                    original_sum += image.pixel(i_row, i_col);
-                    new_sum += new_image.pixel(coords);
+                    new_image.set_pixel(coords[0],coords[1], image.pixel(rowcal));
+                    original_sum += image.pixel(rowcal);
+                    new_sum += new_image.pixel(coords[0], coords[1]);
                 }
             }
         }
 
         // Set the new image data:
         output_image_2d->emplace(std::move(new_image));
-
     }
 
 }
@@ -155,8 +160,8 @@ void larcv3_to_larcv2::convert_image2d(std::string producer){
 void larcv3_to_larcv2::convert_particle(std::string producer){
 
     // Get the particles from the input and output file:
-    larcv3::EventParticle * input_particle = (larcv3::EventParticle *) larcv3_manager.get_data("particle", producer);
-    std::shared_ptr<larcv::EventParticle> output_particle = std::dynamic_pointer_cast<larcv::EventParticle>(larcv2_manager.get_data("particle", producer));
+    larcv::EventParticle * output_particle = (larcv::EventParticle *) larcv2_manager.get_data("particle", producer);
+    std::shared_ptr<larcv3::EventParticle> input_particle = std::dynamic_pointer_cast<larcv3::EventParticle>(larcv3_manager.get_data("particle", producer));
 
     for (auto & particle : input_particle->as_vector()){
         larcv::Particle new_particle;
@@ -223,17 +228,25 @@ void larcv3_to_larcv2::convert_sparse2d(std::string producer){
     // std::cout << "Calling sparse2d for producer " << producer << std::endl;
 
     // Get the particles from the input and output file:
-    larcv3::EventSparseTensor2D  * input_sparse2d  = (larcv3::EventSparseTensor2D *)  larcv3_manager.get_data("sparse2d", producer);
-    std::shared_ptr<larcv::EventSparseTensor2D> output_sparse2d = std::dynamic_pointer_cast<larcv::EventSparseTensor2D> (larcv2_manager.get_data("sparse2d", producer));
+    larcv::EventSparseTensor2D  * output_sparse2d  = (larcv::EventSparseTensor2D *)  larcv2_manager.get_data("sparse2d", producer);
+    std::shared_ptr<larcv3::EventSparseTensor2D> input_sparse2d = std::dynamic_pointer_cast<larcv3::EventSparseTensor2D> (larcv3_manager.get_data("sparse2d", producer));
 
     // print(producer, "Number of input sparse tensors: ", input_sparse2d.as_vector().size())
     for ( auto & sparse2d : input_sparse2d->as_vector()){
         
         // Create a larcv3 meta for this:
-        larcv::ImageMeta2D meta; 
-        meta.set_dimension(0, sparse2d.meta().width(),  sparse2d.meta().rows(), sparse2d.meta().min_x());
-        meta.set_dimension(1, sparse2d.meta().height(), sparse2d.meta().cols(), sparse2d.meta().min_y());
-        meta.set_projection_id(sparse2d.meta().id());
+        //larcv::ImageMeta meta; 
+
+        larcv::ImageMeta meta=larcv::ImageMeta(sparse2d.meta().min(0), sparse2d.meta().min(1),
+                 sparse2d.meta().max(0), sparse2d.meta().max(1),
+                 sparse2d.meta().number_of_voxels(0), sparse2d.meta().number_of_voxels(1), 
+                 static_cast<larcv::ProjectionID_t>(sparse2d.meta().id()),static_cast<larcv::DistanceUnit_t>(sparse2d.meta().unit()));
+
+
+
+        // meta.set_dimension(0, sparse2d.meta().width(),  sparse2d.meta().rows(), sparse2d.meta().min()[0]);
+        // meta.set_dimension(1, sparse2d.meta().height(), sparse2d.meta().cols(), sparse2d.meta().min()[1]);
+        // meta.set_projection_id(sparse2d.meta().id());
 
         // print(sparse2d.meta().dump())
         // Create a place to hold the output sparse2d:
@@ -242,12 +255,13 @@ void larcv3_to_larcv2::convert_sparse2d(std::string producer){
 
         // Convert all of the voxels:
         for (auto & original_voxel : sparse2d.as_vector()){
-            std::vector<size_t> vec_of_coords;
-            vec_of_coords.push_back(sparse2d.meta().index_to_row(original_voxel.id()));
-            vec_of_coords.push_back(sparse2d.meta().index_to_col(original_voxel.id()));
-            auto  new_index = meta.index(vec_of_coords);
-            st.emplace(larcv::Voxel(new_index, original_voxel.value()));
-        }
+            // std::vector<size_t> vec_of_coords;
+            // vec_of_coords.push_back(sparse2d.meta().coordinates(original_voxel.id())[0]);
+            // vec_of_coords.push_back(sparse2d.meta().coordinates(original_voxel.id())[1]);
+            // auto new_index = meta.index(vec_of_coords[0],vec_of_coords[1]);
+            // st.emplace(larcv::Voxel(new_index, original_voxel.value()));
+            st.emplace(meta.pos_x(original_voxel.id()), meta.pos_y(original_voxel.id()),original_voxel.value());
+                }
 
         // Set the new image data:
         output_sparse2d->emplace(std::move(st));
@@ -258,53 +272,68 @@ void larcv3_to_larcv2::convert_sparse2d(std::string producer){
 }
 void larcv3_to_larcv2::convert_sparse3d(std::string producer){
     // Get the tensors from the input and output file:
-    larcv3::EventSparseTensor3D  * input_sparse3d  = (larcv3::EventSparseTensor3D * )  larcv3_manager.get_data("sparse3d", producer);
-    std::shared_ptr<larcv::EventSparseTensor3D> output_sparse3d = std::dynamic_pointer_cast<larcv::EventSparseTensor3D> (larcv2_manager.get_data("sparse3d", producer));
+    larcv::EventSparseTensor3D  * output_sparse3d  = (larcv::EventSparseTensor3D * )  larcv2_manager.get_data("sparse3d", producer);
+    std::shared_ptr<larcv3::EventSparseTensor3D> input_sparse3d = std::dynamic_pointer_cast<larcv3::EventSparseTensor3D> (larcv3_manager.get_data("sparse3d", producer));
 
-    auto & original_meta = input_sparse3d->meta();
+    auto &original_meta = input_sparse3d->at(0).meta();
 
     // Create a larcv3 meta for this:
-    larcv::ImageMeta3D meta; 
-    meta.set_dimension(0, original_meta.width(),  original_meta.num_voxel_x(), original_meta.min_x());
-    meta.set_dimension(1, original_meta.height(), original_meta.num_voxel_y(), original_meta.min_y());
-    meta.set_dimension(2, original_meta.depth(), original_meta.num_voxel_z(), original_meta.min_z());
-    meta.set_projection_id(0);
-    larcv::SparseTensor3D st;
+    // larcv::ImageMeta meta; 
+    // meta.set_dimension(0, original_meta.width(),  original_meta.num_voxel_x(), original_meta.min[0]);
+    // meta.set_dimension(1, original_meta.height(), original_meta.num_voxel_y(), original_meta.min[1]);
+    // meta.set_dimension(2, original_meta.depth(), original_meta.num_voxel_z(), original_meta.min[2]);
+    // meta.set_projection_id(0);
+
+    larcv::Voxel3DMeta meta;
+
+    meta.set(original_meta.min(0), original_meta.min(1), original_meta.min(2),
+             original_meta.max(0), original_meta.max(1), original_meta.min(2),
+             original_meta.number_of_voxels(0), original_meta.number_of_voxels(1), original_meta.number_of_voxels(2),
+             static_cast<larcv::DistanceUnit_t>(original_meta.unit()));
+
+        larcv::SparseTensor3D st;
     st.meta(meta);
 
     for (auto & original_voxel : input_sparse3d->as_vector()){
         // Convert all of the voxels:
-        std::vector<size_t> vec_of_coords;
-        vec_of_coords.push_back(original_meta.id_to_x_index(original_voxel.id()));
-        vec_of_coords.push_back(original_meta.id_to_y_index(original_voxel.id()));
-        vec_of_coords.push_back(original_meta.id_to_z_index(original_voxel.id()));
-        auto new_index = meta.index(vec_of_coords);
-        st.emplace(larcv::Voxel(new_index, original_voxel.value()));
+        // std::vector<size_t> vec_of_coords;
+        // vec_of_coords.push_back(original_meta.id_to_x_index(original_voxel.id()));
+        // vec_of_coords.push_back(original_meta.id_to_y_index(original_voxel.id()));
+        // vec_of_coords.push_back(original_meta.id_to_z_index(original_voxel.id()));
+        // auto new_index = meta.index(vec_of_coords[0], vec_of_coords[1],vec_of_coords[2]);
+        // st.emplace(larcv::Voxel(new_index, original_voxel.value()));
+        st.emplace(meta.pos_x(original_voxel.id()), meta.pos_y(original_voxel.id()), meta.pos_z(original_voxel.id()), original_voxel.sum());
     }
         
 
 
     // Set the new image data:
-    output_sparse3d->emplace(std::move(st));
+    output_sparse3d->emplace(std::move(st),meta);
 
 }
 void larcv3_to_larcv2::convert_cluster2d(std::string producer){
     // Get the clusters from the input and output file:
-    larcv3::EventClusterPixel2D  * input_cluster_2D  = (larcv3::EventClusterPixel2D *)  larcv3_manager.get_data("cluster2d", producer);
-    std::shared_ptr<larcv::EventSparseCluster2D> output_cluster_2D = std::dynamic_pointer_cast<larcv::EventSparseCluster2D> (larcv2_manager.get_data("cluster2d", producer));
+larcv::EventClusterPixel2D  * output_cluster_2D  = (larcv::EventClusterPixel2D *)  larcv2_manager.get_data("cluster2d", producer);
+    std::shared_ptr<larcv3::EventSparseCluster2D> input_cluster_2D = std::dynamic_pointer_cast<larcv3::EventSparseCluster2D> (larcv3_manager.get_data("cluster2d", producer));
 
     for (auto & cluster2d_set : input_cluster_2D->as_vector()){
 
         auto & original_meta = cluster2d_set.meta();
 
         // Create a larcv3 meta for this:
-        larcv::ImageMeta2D meta; 
-        meta.set_dimension(0, original_meta.width(),  original_meta.rows(), original_meta.min_x());
-        meta.set_dimension(1, original_meta.height(), original_meta.cols(), original_meta.min_y());
-        meta.set_projection_id(original_meta.id());
+        // larcv::ImageMeta meta; 
+        // meta.set_dimension(0, original_meta.width(),  original_meta.rows(), original_meta.min[0]);
+        // meta.set_dimension(1, original_meta.height(), original_meta.cols(), original_meta.min[1]);
+        // meta.set_projection_id(original_meta.id());
+
+
+        larcv::ImageMeta meta=larcv::ImageMeta(original_meta.min(0), original_meta.min(1),
+                 original_meta.max(0), original_meta.max(1),
+                 original_meta.number_of_voxels(0), original_meta.number_of_voxels(1), 
+                 static_cast<larcv::ProjectionID_t>(original_meta.id()),static_cast<larcv::DistanceUnit_t>(original_meta.unit()));
 
         // Create a place to hold the output cluster2d:
-        larcv::SparseCluster2D output_cluster2d_set;
+        larcv::ClusterPixel2D output_cluster2d_set;
         output_cluster2d_set.meta(meta);
         for (auto & cluster : cluster2d_set.as_vector()){
             //holder for new cluster:
@@ -313,9 +342,9 @@ void larcv3_to_larcv2::convert_cluster2d(std::string producer){
             // Convert all of the voxels:
             for (auto & original_voxel : cluster.as_vector()){
                 std::vector<size_t> vec_of_coords;
-                vec_of_coords.push_back(original_meta.index_to_row(original_voxel.id()));
-                vec_of_coords.push_back(original_meta.index_to_col(original_voxel.id()));
-                auto new_index = meta.index(vec_of_coords);
+                vec_of_coords.push_back(original_meta.coordinates(original_voxel.id())[0]);
+                vec_of_coords.push_back(original_meta.coordinates(original_voxel.id())[1]);
+                auto new_index = meta.index(vec_of_coords[0],vec_of_coords[1]);
                 vs.emplace(new_index, original_voxel.value(), false);
             }
             output_cluster2d_set.emplace(std::move(vs));
@@ -332,20 +361,27 @@ void larcv3_to_larcv2::convert_cluster2d(std::string producer){
 }
 void larcv3_to_larcv2::convert_cluster3d(std::string producer){
    
-    larcv3::EventClusterVoxel3D  * input_cluster_3D  = (larcv3::EventClusterVoxel3D *)  larcv3_manager.get_data("cluster3d", producer);
-    std::shared_ptr<larcv::EventSparseCluster3D> output_cluster_3D = std::dynamic_pointer_cast<larcv::EventSparseCluster3D> (larcv2_manager.get_data("cluster3d", producer));
+    larcv::EventClusterVoxel3D  * output_cluster_3D  = (larcv::EventClusterVoxel3D *)  larcv2_manager.get_data("cluster3d", producer);
+    std::shared_ptr<larcv3::EventSparseCluster3D> input_cluster_3D = std::dynamic_pointer_cast<larcv3::EventSparseCluster3D> (larcv3_manager.get_data("cluster3d", producer));
 
-    auto & original_meta = input_cluster_3D->meta();
+    auto &original_meta = input_cluster_3D->at(0).meta();
 
     // Create a larcv3 meta for this:
-    larcv::ImageMeta3D meta; 
-    meta.set_dimension(0, original_meta.width(),  original_meta.num_voxel_x(), original_meta.min_x());
-    meta.set_dimension(1, original_meta.height(), original_meta.num_voxel_y(), original_meta.min_y());
-    meta.set_dimension(2, original_meta.depth(), original_meta.num_voxel_z(), original_meta.min_z());
-    meta.set_projection_id(0);
+    // larcv::ImageMeta meta; 
+    // meta.set_dimension(0, original_meta.width(),  original_meta.num_voxel_x(), original_meta.min[0]);
+    // meta.set_dimension(1, original_meta.height(), original_meta.num_voxel_y(), original_meta.min[1]);
+    // meta.set_dimension(2, original_meta.depth(), original_meta.num_voxel_z(), original_meta.min[2]);
+    // meta.set_projection_id(0);
 
-    // Create a place to hold the output cluster3d:
-    larcv::SparseCluster3D output_cluster3d_set;
+    larcv::Voxel3DMeta meta;
+
+    meta.set(original_meta.min(0), original_meta.min(1), original_meta.min(2),
+             original_meta.max(0), original_meta.max(1), original_meta.min(2),
+             original_meta.number_of_voxels(0), original_meta.number_of_voxels(1), original_meta.number_of_voxels(2),
+             static_cast<larcv::DistanceUnit_t>(original_meta.unit()));
+
+        // Create a place to hold the output cluster3d:
+        larcv::ClusterVoxel3D output_cluster3d_set;
     output_cluster3d_set.meta(meta);
 
 
@@ -353,24 +389,30 @@ void larcv3_to_larcv2::convert_cluster3d(std::string producer){
 
 
         //holder for new cluster:
-        larcv::VoxelSet vs;
-        vs.id(cluster3d_set.id());
+        larcv::VoxelSetArray vs;
+        
         for (auto & original_voxel :  cluster3d_set.as_vector()){
-            if (original_voxel.id() > meta.total_voxels()) continue;
+            if (original_voxel.id() > meta.size()) continue;
+            //vs.id(original_voxel.id());
             // Convert all of the voxels:
-            std::vector<size_t> vec_of_coords;
-            vec_of_coords.push_back(original_meta.id_to_x_index(original_voxel.id()));
-            vec_of_coords.push_back(original_meta.id_to_y_index(original_voxel.id()));
-            vec_of_coords.push_back(original_meta.id_to_z_index(original_voxel.id()));
-            auto new_index = meta.index(vec_of_coords);
-            vs.emplace(new_index, original_voxel.value(), false);
-           
+            // std::vector<size_t> vec_of_coords;
+            // vec_of_coords.push_back(original_meta.coordinates(original_voxel.id())[0]);
+            // vec_of_coords.push_back(original_meta.coordinates(original_voxel.id())[1]);
+            // vec_of_coords.push_back(original_meta.coordinates(original_voxel.id())[2]);
+            // auto new_index = meta.index(vec_of_coords[0],vec_of_coords[1],vec_of_coords[2]);
+            larcv::VoxelSet vss;
+            for (auto & avoxel :  original_voxel.as_vector())
+            {
+                vss.insert(larcv::Voxel(avoxel.id(), avoxel.value()));
+            }
+
+            vs.emplace(std::move(vss));
         }
-        output_cluster3d_set.emplace(std::move(vs));
+        output_cluster3d_set.emplace(std::move(vs),meta);
 
     }
 
     // Set the new image data:
-    output_cluster_3D->emplace(std::move(output_cluster3d_set));
+    output_cluster_3D->emplace(std::move(output_cluster3d_set),meta);
         
 }
